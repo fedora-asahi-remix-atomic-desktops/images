@@ -1,0 +1,114 @@
+name: "Build Fedora Asahi Remix Atomic Desktops Bootable Container images"
+
+env:
+  REGISTRY: "quay.io/fedora-asahi-remix-atomic-desktops"
+
+on:
+  pull_request:
+    branches:
+      - f42
+  push:
+    branches:
+      - f42
+  schedule:
+    # At 02:00 every day
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions: read-all
+
+# Prevent multiple workflow runs from racing to ensure that pushes are made
+# sequentialy for the main branch. Also cancel in progress workflow runs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-push-image:
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: ['silverblue', 'kinoite', 'base-atomic']
+
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: "quay.io/fedora-ostree-desktops/buildroot:42"
+      options: "--security-opt=label=disable --privileged --user 0:0 --device=/dev/kvm --device=/dev/fuse --volume /:/run/host:rw"
+    steps:
+      - name: Reclaim disk space
+        run: |
+          rm -rf "/run/host/usr/local/lib/android"
+
+      - name: Fixup containers/storage.conf
+        run: |
+          sed -i 's/driver = "overlay"/driver = "vfs"/' /usr/share/containers/storage.conf
+
+      - name: Fixup GitHub homedir
+        run: |
+          mkdir -p /github/home/.docker/
+
+      - name: Login to Container Registry
+        uses: redhat-actions/podman-login@v1
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/f42'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.BOT_USERNAME }}
+          password: ${{ secrets.BOT_SECRET }}
+          auth_file_path: /tmp/auth.json
+
+      - uses: sigstore/cosign-installer@v3.6.0
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/f42'
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get GPG keys for Asahi repos
+        run: |
+          dnf copr enable -y @asahi/fedora-remix-branding
+          dnf install -y asahi-repos
+
+      - name: Install latest rpm-ostree package from testing repos
+        run: |
+          dnf upgrade -y --enablerepo=updates-testing --refresh rpm-ostree
+
+      - name: Build Bootable Container image
+        run: |
+          just compose-image ${VARIANT}-asahi-remix
+        env:
+          VARIANT: ${{ matrix.variant }}
+
+      - name: Push container image to container registry
+        id: push
+        run: |
+          buildid=""
+          if [[ -f ".buildid" ]]; then
+              buildid="$(< .buildid)"
+          else
+              buildid="$(date '+%Y%m%d.0')"
+              echo "${buildid}" > .buildid
+          fi
+          version="$(rpm-ostree compose tree --print-only --repo=repo silverblue-asahi-remix.yaml | jq -r '."mutate-os-release"')"
+          skopeo copy \
+            --authfile /tmp/auth.json \
+            --retry-times 3 \
+            --dest-compress-format zstd \
+            oci-archive:${VARIANT}-asahi-remix.ociarchive \
+            docker://${REGISTRY}/${VARIANT}:${version}.${buildid}
+          skopeo copy \
+            --authfile /tmp/auth.json \
+            --retry-times 3 \
+            --dest-compress-format zstd \
+            docker://${REGISTRY}/${VARIANT}:${version}.${buildid} \
+            docker://${REGISTRY}/${VARIANT}:${version}
+        env:
+          VARIANT: ${{ matrix.variant }}
+
+      - name: Sign container image
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/f42'
+        run: |
+          version="$(rpm-ostree compose tree --print-only --repo=repo silverblue-asahi-remix.yaml | jq -r '."mutate-os-release"')"
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${VARIANT}:${version}
+        env:
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          VARIANT: ${{ matrix.variant }}
