@@ -1,0 +1,17 @@
+variables:
+  bootable_container: true
+
+include:
+  - silverblue-common.yaml
+  - asahi-remix.yaml
+
+ref: fedora/43/${basearch}/silverblue-asahi-remix
+rojig:
+  name: fedora-silverblue-asahi-remix
+  summary: "Fedora Silverblue Asahi Remix"
+  license: MIT
+
+# Kept in the leaf manifest as they are overwritten by Pungi in composes
+repos:
+  - fedora-43
+  - fedora-43-updates
