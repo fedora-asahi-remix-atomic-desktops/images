@@ -1,0 +1,18 @@
+variables:
+  bootable_container: true
+  variant: "kinoite-asahi-remix"
+
+include:
+  - kinoite-common.yaml
+  - asahi-remix.yaml
+
+ref: fedora/41/${basearch}/kinoite-asahi-remix
+rojig:
+  name: fedora-kinoite-asahi-remix
+  summary: "Fedora Kinoite Asahi Remix"
+  license: MIT
+
+# Kept in the leaf manifest as they are overwritten by Pungi in composes
+repos:
+  - fedora-41
+  - fedora-41-updates
