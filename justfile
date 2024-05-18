@@ -11,10 +11,12 @@ force_nocache := "true"
 # Just doesn't have a native dict type, but quoted bash dictionary works fine
 pretty_names := '(
     [silverblue]="Silverblue"
+    [silverblue-asahi-remix]="Silverblue Asahi Remix"
     [kinoite]="Kinoite"
     [kinoite-nightly]="Kinoite"
     [kinoite-beta]="Kinoite"
     [kinoite-mobile]="Kinoite"
+    [kinoite-asahi-remix]="Kinoite Asahi Remix"
     [sway-atomic]="Sway Atomic"
     [budgie-atomic]="Budgie Atomic"
     [xfce-atomic]="XFCE Atomic"
