@@ -1,0 +1,25 @@
+metadata:
+  summary: "Fedora Asahi Remix Base Atomic"
+
+variables:
+  variant: "asahi-remix-base-atomic"
+
+include:
+  - common.yaml
+  - asahi-remix.yaml
+
+packages:
+  # XWayland support
+  - xorg-x11-server-Xwayland
+  # Portals for Flatpak
+  - xdg-desktop-portal
+  - xdg-desktop-portal-gtk
+
+# Can only be excluded on variants that do not include GNOME Software
+exclude-packages:
+  - PackageKit-glib
+
+# Kept in the leaf manifest as they are overwritten by Pungi in composes
+repos:
+  - fedora-43
+  - fedora-43-updates
