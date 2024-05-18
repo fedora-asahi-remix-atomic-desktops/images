@@ -1,0 +1,18 @@
+variables:
+  bootable_container: true
+  variant: "kinoite"
+
+include:
+  - kinoite-common.yaml
+  - asahi-remix.yaml
+
+ref: fedora/rawhide/${basearch}/kinoite-asahi-remix
+rojig:
+  name: fedora-kinoite-asahi-remix
+  summary: "Fedora Kinoite Asahi Remix"
+  license: MIT
+
+# Kept in the leaf manifest as they are overwritten by Pungi in composes
+repos:
+  - fedora-43
+  - fedora-43-updates
