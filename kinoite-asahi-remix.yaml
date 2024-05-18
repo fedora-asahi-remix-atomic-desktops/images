@@ -1,0 +1,14 @@
+metadata:
+  summary: "Fedora Asahi Remix Kinoite"
+
+variables:
+  variant: "asahi-remix-kinoite"
+
+include:
+  - kinoite-common.yaml
+  - asahi-remix.yaml
+
+# Kept in the leaf manifest as they are overwritten by Pungi in composes
+repos:
+  - fedora-43
+  - fedora-43-updates
