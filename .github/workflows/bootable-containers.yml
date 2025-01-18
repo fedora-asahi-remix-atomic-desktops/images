@@ -1,0 +1,100 @@
+name: "Build Fedora Asahi Atomic Remix Bootable Container images"
+
+env:
+  NAME: "fedora-kinoite-uki"
+  REGISTRY: "quay.io/fedora-asahi-atomic-remix"
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  schedule:
+    # At 02:00 every day
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions: read-all
+
+# Prevent multiple workflow runs from racing to ensure that pushes are made
+# sequentialy for the main branch. Also cancel in progress workflow runs for
+# pull requests only.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: true
+
+jobs:
+  build-push-image:
+    strategy:
+      matrix:
+        variant: ['silverblue', 'kinoite']
+
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: quay.io/fedora-asahi-atomic-remix/buildroot
+      options: --security-opt=label=disable --privileged --user 0:0 --device=/dev/kvm --device=/dev/fuse --volume /:/run/host:rw --volume /var/run/docker.sock:/var/run/docker.sock
+    steps:
+      - name: Reclaim disk space
+        run: |
+          dnf install -y moby-engine
+          docker image prune --all --force
+          rm -rf "/run/host/usr/local/lib/android"
+          dnf remove -y moby-engine
+
+      - name: Fixup containers/storage.conf
+        run: |
+          sed -i 's/driver = "overlay"/driver = "vfs"/' /usr/share/containers/storage.conf
+
+      - name: Fixup GitHub homedir
+        run: |
+          mkdir -p /github/home/.docker/
+
+      - name: Login to Container Registry
+        uses: redhat-actions/podman-login@v1
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.BOT_USERNAME }}
+          password: ${{ secrets.BOT_SECRET }}
+          auth_file_path: /tmp/auth.json
+
+      - uses: sigstore/cosign-installer@v3.6.0
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get GPG keys for Asahi repos
+        run: |
+          dnf copr enable -y @asahi/fedora-remix-branding
+          dnf install -y asahi-repos
+
+      - name: Build Bootable Container image
+        run: |
+          just compose-image ${VARIANT}-asahi-remix
+        env:
+          VARIANT: ${{ matrix.variant }}
+
+      - name: Push container image to container registry
+        id: push
+        run: |
+          skopeo copy \
+            --authfile /tmp/auth.json \
+            --retry-times 3 \
+            --dest-compress-format zstd \
+            oci-archive:${VARIANT}-asahi-remix.ociarchive \
+            docker://${REGISTRY}/${VARIANT}:latest
+        env:
+          VARIANT: ${{ matrix.variant }}
+
+      - name: Sign container image
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        run: |
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${VARIANT}:latest
+        env:
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          VARIANT: ${{ matrix.variant }}
