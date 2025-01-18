@@ -72,6 +72,15 @@ jobs:
           dnf copr enable -y @asahi/fedora-remix-branding
           dnf install -y asahi-repos
 
+      - name: Install fixed rpm-ostree package
+        run: |
+          # https://koji.fedoraproject.org/koji/taskinfo?taskID=128080559
+          curl --remote-name-all \
+            "https://kojipkgs.fedoraproject.org//work/tasks/780/128080780/rpm-ostree-2025.1-2.fc41.aarch64.rpm" \
+            "https://kojipkgs.fedoraproject.org//work/tasks/780/128080780/rpm-ostree-libs-2025.1-2.fc41.aarch64.rpm"
+          dnf install -y ./rpm-ostree*.rpm
+          rm -rf ./rpm-ostree*.rpm
+
       - name: Build Bootable Container image
         run: |
           just compose-image ${VARIANT}-asahi-remix
