@@ -5,9 +5,6 @@ conditional-include:
   - if: variant == "kinoite"
     include:
       - kinoite-packages.yaml
-  - if: variant == "kinoite-asahi-remix"
-    include:
-      - kinoite-packages.yaml
   - if: variant == "kinoite-mobile"
     include:
       - kinoite-mobile-packages.yaml
