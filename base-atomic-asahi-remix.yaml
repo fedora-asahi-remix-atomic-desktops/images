@@ -1,0 +1,28 @@
+variables:
+  bootable_container: true
+  variant: "base-atomic"
+
+include:
+  - common.yaml
+  - asahi-remix.yaml
+
+ref: fedora/41/${basearch}/base-atomic-asahi-remix
+rojig:
+  name: fedora-base-atomic-asahi-remix
+  summary: "Fedora Base Atomic Asahi Remix"
+  license: MIT
+
+packages:
+  # Generic release package for desktop variants
+  - fedora-release
+  - fedora-release-ostree-desktop
+  # XWayland support
+  - xorg-x11-server-Xwayland
+  # Portals for Flatpak
+  - xdg-desktop-portal
+  - xdg-desktop-portal-gtk
+
+# Kept in the leaf manifest as they are overwritten by Pungi in composes
+repos:
+  - fedora-41
+  - fedora-41-updates

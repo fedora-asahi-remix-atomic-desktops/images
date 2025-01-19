@@ -22,6 +22,7 @@ pretty_names := '(
     [xfce-atomic]="XFCE Atomic"
     [lxqt-atomic]="LXQt Atomic"
     [base-atomic]="Base Atomic"
+    [base-atomic-asahi-remix]="Base Atomic Asahi Remix"
     [cosmic-atomic]="COSMIC Atomic"
 )'
 
