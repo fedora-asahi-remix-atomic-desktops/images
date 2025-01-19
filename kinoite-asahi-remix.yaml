@@ -1,6 +1,6 @@
 variables:
   bootable_container: true
-  variant: "kinoite-asahi-remix"
+  variant: "kinoite"
 
 include:
   - kinoite-common.yaml
