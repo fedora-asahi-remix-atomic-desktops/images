@@ -4,9 +4,9 @@ variables:
 include:
   - common.yaml
 
-ref: fedora/42/${basearch}/base
+ref: fedora/42/${basearch}/base-atomic
 rojig:
-  name: fedora-base
+  name: fedora-base-atomic
   summary: "Fedora Base Atomic"
   license: MIT
 
