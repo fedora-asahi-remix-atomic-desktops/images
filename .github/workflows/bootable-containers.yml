@@ -30,7 +30,7 @@ jobs:
   build-push-image:
     strategy:
       matrix:
-        variant: ['silverblue', 'kinoite']
+        variant: ['silverblue', 'kinoite', 'base-atomic']
 
     runs-on: ubuntu-24.04-arm
     container:
