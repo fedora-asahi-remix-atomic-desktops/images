@@ -29,6 +29,7 @@ concurrency:
 jobs:
   build-push-image:
     strategy:
+      fail-fast: false
       matrix:
         variant: ['silverblue', 'kinoite', 'base-atomic']
 
