@@ -2,7 +2,7 @@ name: "Build buildroot container image for aarch64"
 
 env:
   NAME: "buildroot"
-  REGISTRY: "quay.io/fedora-asahi-atomic-remix"
+  REGISTRY: "quay.io/fedora-asahi-remix-atomic-desktops"
 
 on:
   pull_request:
