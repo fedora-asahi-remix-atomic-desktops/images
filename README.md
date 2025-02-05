@@ -1,4 +1,4 @@
-# Unofficial and experimental Fedora Asahi Atomic Remix Bootable Container images
+# Unofficial and experimental Fedora Asahi Remix Atomic Desktops Bootable Container images
 
 **Those are unofficial, experimental Bootable Container images of Silverblue
 and Kinoite using the packages from the Fedora Asahi Remix project.**
@@ -30,16 +30,16 @@ TODO
 This project builds the following images for the Fedora releases currently
 supported by the Asahi project (may not always be the latest release):
 
-- Fedora Silverblue Asahi Remix:
+- Fedora Asahi Remix Silverblue:
     - Unofficial build based on the official Silverblue variant
-    - [quay.io/repository/fedora-asahi-atomic-remix/silverblue](https://quay.io/repository/fedora-asahi-atomic-remix/silverblue?tab=tags)
-- Fedora Kinoite Asahi Remix:
+    - [quay.io/repository/fedora-asahi-remix-atomic-desktops/silverblue](https://quay.io/repository/fedora-asahi-remix-atomic-desktops/silverblue?tab=tags)
+- Fedora Asahi Remix Kinoite:
     - Unofficial build based on the official Kinoite variant
-    - [quay.io/repository/fedora-asahi-atomic-remix/kinoite](https://quay.io/repository/fedora-asahi-atomic-remix/kinoite?tab=tags)
-- Fedora Base Atomic Asahi Remix:
+    - [quay.io/repository/fedora-asahi-remix-atomic-desktops/kinoite](https://quay.io/repository/fedora-asahi-remix-atomic-desktops/kinoite?tab=tags)
+- Fedora Asahi Remix Base Atomic:
     - Unofficial build based on the unofficial Fedora Base Atomic variant
     - No desktop environment included
-    - [quay.io/repository/fedora-asahi-atomic-remix/base-atomic](https://quay.io/repository/fedora-asahi-atomic-remix/base-atomic?tab=tags)
+    - [quay.io/repository/fedora-asahi-remix-atomic-desktops/base-atomic](https://quay.io/repository/fedora-asahi-remix-atomic-desktops/base-atomic?tab=tags)
 
 ## Container image signatures
 
