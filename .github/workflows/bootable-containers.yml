@@ -1,8 +1,7 @@
-name: "Build Fedora Asahi Atomic Remix Bootable Container images"
+name: "Build Fedora Asahi Remix Atomic Desktops Bootable Container images"
 
 env:
-  NAME: "fedora-kinoite-uki"
-  REGISTRY: "quay.io/fedora-asahi-atomic-remix"
+  REGISTRY: "quay.io/fedora-asahi-remix-atomic-desktops"
 
 on:
   pull_request:
@@ -35,7 +34,7 @@ jobs:
 
     runs-on: ubuntu-24.04-arm
     container:
-      image: quay.io/fedora-asahi-atomic-remix/buildroot
+      image: quay.io/fedora-asahi-remix-atomic-desktops/buildroot
       options: --security-opt=label=disable --privileged --user 0:0 --device=/dev/kvm --device=/dev/fuse --volume /:/run/host:rw --volume /var/run/docker.sock:/var/run/docker.sock
     steps:
       - name: Reclaim disk space
