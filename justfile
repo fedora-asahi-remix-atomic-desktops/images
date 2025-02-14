@@ -446,3 +446,51 @@ multi-arch-manifest variant=default_variant:
     buildah manifest push \
         "${image}:${version}" \
         "docker://${image}:${version}"
+
+# Sign containers using cosign (sigstore)
+sign variant=default_variant:
+    #!/bin/bash
+    set -euxo pipefail
+
+    variant={{variant}}
+
+    declare -A pretty_names={{pretty_names}}
+    variant_pretty=${pretty_names[$variant]-}
+    if [[ -z $variant_pretty ]]; then
+        echo "Unknown variant"
+        exit 1
+    fi
+
+    if [[ -z ${CI_REGISTRY_USER+x} ]] || [[ -z ${CI_REGISTRY_PASSWORD+x} ]]; then
+        echo "Skipping artifact archiving: Not in CI"
+        exit 0
+    fi
+    if [[ "${CI}" != "true" ]]; then
+        echo "Skipping artifact archiving: Not in CI"
+        exit 0
+    fi
+
+    version=""
+    if [[ "$(git rev-parse --abbrev-ref HEAD)" == "main" ]] || [[ -f "fedora-rawhide.repo" ]]; then
+        version="rawhide"
+    else
+        version="$(rpm-ostree compose tree --print-only --repo=repo ${variant}.yaml | jq -r '."mutate-os-release"')"
+    fi
+
+    # Login to the registry
+    skopeo login \
+        --username "${CI_REGISTRY_USER}" \
+        --password "${CI_REGISTRY_PASSWORD}" \
+        --authfile="${HOME}/.docker/config.json" \
+        quay.io
+
+    # Decode private key
+    printenv "COSIGN_PRIVATE_KEY" > private.key.b64
+    base64 --decode private.key.b64 > private.key
+
+    # Sign images recursively
+    image="quay.io/fedora-ostree-desktops/${variant}"
+    cosign sign -y --key private.key --recursive=true ${image}:${version}
+
+    # Cleanup private key
+    rm private.key.b64 private.key
