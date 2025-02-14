@@ -401,3 +401,48 @@ upload-container variant=default_variant arch=default_arch:
             "docker://${image}:${version}.${buildid}" \
             "docker://${image}:latest${suffix}"
     fi
+
+# Create a multi-arch manifest for a given variant and push it to a registry
+multi-arch-manifest variant=default_variant:
+    #!/bin/bash
+    set -euxo pipefail
+
+    variant={{variant}}
+
+    declare -A pretty_names={{pretty_names}}
+    variant_pretty=${pretty_names[$variant]-}
+    if [[ -z $variant_pretty ]]; then
+        echo "Unknown variant"
+        exit 1
+    fi
+
+    if [[ -z ${CI_REGISTRY_USER+x} ]] || [[ -z ${CI_REGISTRY_PASSWORD+x} ]]; then
+        echo "Skipping multi-arch-manifest: Not in CI"
+        exit 0
+    fi
+    if [[ "${CI}" != "true" ]]; then
+        echo "Skipping multi-arch-manifest: Not in CI"
+        exit 0
+    fi
+
+    version=""
+    if [[ "$(git rev-parse --abbrev-ref HEAD)" == "main" ]] || [[ -f "fedora-rawhide.repo" ]]; then
+        version="rawhide"
+    else
+        version="$(rpm-ostree compose tree --print-only --repo=repo ${variant}.yaml | jq -r '."mutate-os-release"')"
+    fi
+
+    # Login to the registry
+    skopeo login --username "${CI_REGISTRY_USER}" --password "${CI_REGISTRY_PASSWORD}" quay.io
+
+    image="quay.io/fedora-ostree-desktops/${variant}"
+
+    # Create manifest
+    buildah manifest create "${image}:${version}" \
+            "${image}:${version}-x86_64" \
+            "${image}:${version}-aarch64"
+
+    # Push to registry
+    buildah manifest push \
+        "${image}:${version}" \
+        "docker://${image}:${version}"
