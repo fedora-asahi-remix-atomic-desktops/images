@@ -4,6 +4,7 @@
 
 # Set a default for some recipes
 default_variant := "silverblue"
+default_arch := "default"
 # Current default in Pungi
 force_nocache := "true"
 
@@ -332,11 +333,12 @@ lorax variant=default_variant:
         ${pwd}/iso/linux
 
 # Upload the containers to a registry (Quay.io)
-upload-container variant=default_variant:
+upload-container variant=default_variant arch=default_arch:
     #!/bin/bash
     set -euxo pipefail
 
     variant={{variant}}
+    arch={{arch}}
 
     declare -A pretty_names={{pretty_names}}
     variant_pretty=${pretty_names[$variant]-}
@@ -374,22 +376,28 @@ upload-container variant=default_variant:
 
     image="quay.io/fedora-ostree-desktops/${variant}"
 
+    # Only append arch suffix if requested
+    suffix=""
+    if [[ ${arch} != "default" ]]; then
+        suffix="-${arch}"
+    fi
+
     # Support for the zstd:chunked format is not ready yet
     SKOPEO_ARGS="--retry-times 3 --dest-compress-format gzip"
 
     # Push fully versioned tag (major version, build date/id)
     skopeo copy ${SKOPEO_ARGS} \
         "oci-archive:${variant}.ociarchive" \
-        "docker://${image}:${version}.${buildid}"
+        "docker://${image}:${version}.${buildid}${suffix}"
 
     # Update "un-versioned" tag (only major version)
     skopeo copy ${SKOPEO_ARGS} \
-        "docker://${image}:${version}.${buildid}" \
-        "docker://${image}:${version}"
+        "docker://${image}:${version}.${buildid}${suffix}" \
+        "docker://${image}:${version}${suffix}"
 
     if [[ "${variant}" == "kinoite-nightly" ]]; then
         # Update latest tag for kinoite-nightly only
         skopeo copy ${SKOPEO_ARGS} \
             "docker://${image}:${version}.${buildid}" \
-            "docker://${image}:latest"
+            "docker://${image}:latest${suffix}"
     fi
