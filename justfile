@@ -346,11 +346,11 @@ upload-container variant=default_variant:
     fi
 
     if [[ -z ${CI_REGISTRY_USER+x} ]] || [[ -z ${CI_REGISTRY_PASSWORD+x} ]]; then
-        echo "Skipping artifact archiving: Not in CI"
+        echo "Skipping container upload: Not in CI"
         exit 0
     fi
     if [[ "${CI}" != "true" ]]; then
-        echo "Skipping artifact archiving: Not in CI"
+        echo "Skipping container upload: Not in CI"
         exit 0
     fi
 
@@ -369,23 +369,15 @@ upload-container variant=default_variant:
         echo "${buildid}" > .buildid
     fi
 
-    git_commit=""
-    if [[ -n "${CI_COMMIT_SHORT_SHA}" ]]; then
-        git_commit="${CI_COMMIT_SHORT_SHA}"
-    else
-        git_commit="$(git rev-parse --short HEAD)"
-    fi
-
     # Login to the registry
     skopeo login --username "${CI_REGISTRY_USER}" --password "${CI_REGISTRY_PASSWORD}" quay.io
 
-    # Copy to the new names
     image="quay.io/fedora-ostree-desktops/${variant}"
 
-    # Use '--dest-compress-format zstd:chunked' only once 41 is released
+    # Support for the zstd:chunked format is not ready yet
     SKOPEO_ARGS="--retry-times 3 --dest-compress-format gzip"
 
-    # Copy fully versioned tag (major version, build date/id, git commit)
+    # Push fully versioned tag (major version, build date/id)
     skopeo copy ${SKOPEO_ARGS} \
         "oci-archive:${variant}.ociarchive" \
         "docker://${image}:${version}.${buildid}"
