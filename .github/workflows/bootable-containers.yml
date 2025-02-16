@@ -106,13 +106,13 @@ jobs:
             --authfile /tmp/auth.json \
             --retry-times 3 \
             --dest-compress-format zstd \
-            oci-archive:${VARIANT}-asahi-remix.ociarchive \
+            docker://${REGISTRY}/${VARIANT}:${version}.${buildid} \
             docker://${REGISTRY}/${VARIANT}:${version}
           skopeo copy \
             --authfile /tmp/auth.json \
             --retry-times 3 \
             --dest-compress-format zstd \
-            oci-archive:${VARIANT}-asahi-remix.ociarchive \
+            docker://${REGISTRY}/${VARIANT}:${version} \
             docker://${REGISTRY}/${VARIANT}:latest
         env:
           VARIANT: ${{ matrix.variant }}
