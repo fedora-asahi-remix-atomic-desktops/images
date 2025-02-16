@@ -4,20 +4,9 @@ env:
   NAME: "buildroot"
   REGISTRY: "quay.io/fedora-asahi-remix-atomic-desktops"
 
+# See: https://gitlab.com/fedora/ostree/buildroot
+#      https://quay.io/repository/fedora-ostree-desktops/buildroot?tab=tags
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - .github/workflows/buildroot.yml
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/buildroot.yml
-  schedule:
-    # At 01:00 on Monday
-    - cron: '0 1 * * 1'
   workflow_dispatch:
 
 permissions: read-all
