@@ -3,8 +3,10 @@ packages:
   - ark
   - cosmic-edit
   - cosmic-files
+  - cosmic-player
   - cosmic-session
   - cosmic-term
+  - flatpak
   - gnome-disk-utility
   - gnome-keyring-pam
   - gnome-system-monitor
@@ -12,3 +14,4 @@ packages:
   - mesa-dri-drivers
   - mesa-vulkan-drivers
   - plymouth-system-theme
+  - toolbox
