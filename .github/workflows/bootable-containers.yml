@@ -6,10 +6,10 @@ env:
 on:
   pull_request:
     branches:
-      - main
+      - f41
   push:
     branches:
-      - main
+      - f41
   schedule:
     # At 02:00 every day
     - cron: '0 2 * * *'
@@ -52,7 +52,7 @@ jobs:
 
       - name: Login to Container Registry
         uses: redhat-actions/podman-login@v1
-        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/f41'
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.BOT_USERNAME }}
@@ -60,7 +60,7 @@ jobs:
           auth_file_path: /tmp/auth.json
 
       - uses: sigstore/cosign-installer@v3.6.0
-        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/f41'
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -104,19 +104,14 @@ jobs:
             --dest-compress-format zstd \
             docker://${REGISTRY}/${VARIANT}:${version}.${buildid} \
             docker://${REGISTRY}/${VARIANT}:${version}
-          skopeo copy \
-            --authfile /tmp/auth.json \
-            --retry-times 3 \
-            --dest-compress-format zstd \
-            docker://${REGISTRY}/${VARIANT}:${version} \
-            docker://${REGISTRY}/${VARIANT}:latest
         env:
           VARIANT: ${{ matrix.variant }}
 
       - name: Sign container image
-        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/f41'
         run: |
-          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${VARIANT}:latest
+          version="$(rpm-ostree compose tree --print-only --repo=repo silverblue-asahi-remix.yaml | jq -r '."mutate-os-release"')"
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${VARIANT}:${version}
         env:
           COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
