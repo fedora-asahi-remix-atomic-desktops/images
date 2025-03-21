@@ -69,8 +69,7 @@ jobs:
 
       - name: Install fixed rpm-ostree package
         run: |
-          # https://koji.fedoraproject.org/koji/buildinfo?buildID=2669902
-          dnf upgrade -y --enablerepo=updates-testing --refresh --advisory=FEDORA-2025-e87687d6d2
+          dnf upgrade -y --enablerepo=updates-testing --refresh rpm-ostree
 
       - name: Build Bootable Container image
         run: |
