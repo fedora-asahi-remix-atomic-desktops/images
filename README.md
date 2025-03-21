@@ -36,3 +36,8 @@ supported by the Asahi project (may not always be the latest release):
 - Fedora Kinoite Asahi Remix:
     - Unofficial build based on the official Kinoite variant
     - [quay.io/repository/fedora-asahi-atomic-remix/kinoite](https://quay.io/repository/fedora-asahi-atomic-remix/kinoite?tab=tags)
+
+## Container image signatures
+
+The images are signed using cosign and can be verified using the public key
+included in the repo.
