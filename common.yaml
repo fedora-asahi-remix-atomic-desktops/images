@@ -146,6 +146,8 @@ exclude-packages:
   - qemu-kvm-core
   - qemu-device-display-virtio-gpu
   - qemu-device-display-virtio-vga
+  # See: https://github.com/fedora-silverblue/issue-tracker/issues/646
+  - hplip-gui
 
 postprocess:
   - |
