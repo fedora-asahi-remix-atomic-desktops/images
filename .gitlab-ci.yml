@@ -5,41 +5,453 @@
 # https://fedoraproject.org/wiki/Zuul-based-ci
 
 # See: https://gitlab.com/fedora/ostree/buildroot
-image: quay.io/fedora-ostree-desktops/buildroot
+image: quay.io/fedora-ostree-desktops/buildroot:41
+
+# As those are not official images, we build all available variants.
+# We build the images for merge requests, we push and sign them for commits
+# pushed to release branches and scheduled pipelines.
 
 stages:
   - build
+  - merge
 
-# As those are not official images, we build all available variants
-.parallel:
-  parallel:
-    matrix:
-    - VARIANT:
-      - silverblue
-      - kinoite
-      - kinoite-mobile
-      - sway-atomic
-      - xfce-atomic
-      - lxqt-atomic
-      - budgie-atomic
-      - base-atomic
-      - cosmic-atomic
-
-# Only build the images for merge requests
-buildmr:
+mr-silverblue-x86_64:
   stage: build
   script:
-    - just compose-image $VARIANT
-  parallel: !reference [.parallel, parallel]
+    - just compose-image silverblue
+  tags:
+    - saas-linux-small-amd64
   rules:
-  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-# Build and upload the images for commits pushed to the branch & scheduled pipelines
-build:
+mr-silverblue-aarch64:
   stage: build
   script:
-    - just compose-image $VARIANT
-    - just upload-container $VARIANT
-  parallel: !reference [.parallel, parallel]
+    - just compose-image silverblue
+  tags:
+    - saas-linux-small-arm64
   rules:
-  - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-silverblue-x86_64:
+  stage: build
+  script:
+    - just compose-image silverblue
+    - just upload-container silverblue x86_64
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+build-silverblue-aarch64:
+  stage: build
+  script:
+    - just compose-image silverblue
+    - just upload-container silverblue aarch64
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+merge-silverblue:
+  stage: merge
+  script:
+    - just multi-arch-manifest silverblue
+    - just sign silverblue
+  needs: ["build-silverblue-x86_64", "build-silverblue-aarch64"]
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+mr-kinoite-x86_64:
+  stage: build
+  script:
+    - just compose-image kinoite
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+mr-kinoite-aarch64:
+  stage: build
+  script:
+    - just compose-image kinoite
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-kinoite-x86_64:
+  stage: build
+  script:
+    - just compose-image kinoite
+    - just upload-container kinoite x86_64
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+build-kinoite-aarch64:
+  stage: build
+  script:
+    - just compose-image kinoite
+    - just upload-container kinoite aarch64
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+merge-kinoite:
+  stage: merge
+  script:
+    - just multi-arch-manifest kinoite
+    - just sign kinoite
+  needs: ["build-kinoite-x86_64", "build-kinoite-aarch64"]
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+mr-kinoite-mobile-x86_64:
+  stage: build
+  script:
+    - just compose-image kinoite-mobile
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+mr-kinoite-mobile-aarch64:
+  stage: build
+  script:
+    - just compose-image kinoite-mobile
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-kinoite-mobile-x86_64:
+  stage: build
+  script:
+    - just compose-image kinoite-mobile
+    - just upload-container kinoite-mobile x86_64
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+build-kinoite-mobile-aarch64:
+  stage: build
+  script:
+    - just compose-image kinoite-mobile
+    - just upload-container kinoite-mobile aarch64
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+merge-kinoite-mobile:
+  stage: merge
+  script:
+    - just multi-arch-manifest kinoite-mobile
+    - just sign kinoite-mobile
+  needs: ["build-kinoite-mobile-x86_64", "build-kinoite-mobile-aarch64"]
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+mr-sway-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image sway-atomic
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+mr-sway-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image sway-atomic
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-sway-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image sway-atomic
+    - just upload-container sway-atomic x86_64
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+build-sway-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image sway-atomic
+    - just upload-container sway-atomic aarch64
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+merge-sway-atomic:
+  stage: merge
+  script:
+    - just multi-arch-manifest sway-atomic
+    - just sign sway-atomic
+  needs: ["build-sway-atomic-x86_64", "build-sway-atomic-aarch64"]
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+mr-xfce-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image xfce-atomic
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+mr-xfce-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image xfce-atomic
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-xfce-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image xfce-atomic
+    - just upload-container xfce-atomic x86_64
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+build-xfce-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image xfce-atomic
+    - just upload-container xfce-atomic aarch64
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+merge-xfce-atomic:
+  stage: merge
+  script:
+    - just multi-arch-manifest xfce-atomic
+    - just sign xfce-atomic
+  needs: ["build-xfce-atomic-x86_64", "build-xfce-atomic-aarch64"]
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+mr-lxqt-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image lxqt-atomic
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+mr-lxqt-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image lxqt-atomic
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-lxqt-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image lxqt-atomic
+    - just upload-container lxqt-atomic x86_64
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+build-lxqt-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image lxqt-atomic
+    - just upload-container lxqt-atomic aarch64
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+merge-lxqt-atomic:
+  stage: merge
+  script:
+    - just multi-arch-manifest lxqt-atomic
+    - just sign lxqt-atomic
+  needs: ["build-lxqt-atomic-x86_64", "build-lxqt-atomic-aarch64"]
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+mr-budgie-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image budgie-atomic
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+mr-budgie-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image budgie-atomic
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-budgie-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image budgie-atomic
+    - just upload-container budgie-atomic x86_64
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+build-budgie-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image budgie-atomic
+    - just upload-container budgie-atomic aarch64
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+merge-budgie-atomic:
+  stage: merge
+  script:
+    - just multi-arch-manifest budgie-atomic
+    - just sign budgie-atomic
+  needs: ["build-budgie-atomic-x86_64", "build-budgie-atomic-aarch64"]
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+mr-base-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image base-atomic
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+mr-base-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image base-atomic
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-base-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image base-atomic
+    - just upload-container base-atomic x86_64
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+build-base-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image base-atomic
+    - just upload-container base-atomic aarch64
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+merge-base-atomic:
+  stage: merge
+  script:
+    - just multi-arch-manifest base-atomic
+    - just sign base-atomic
+  needs: ["build-base-atomic-x86_64", "build-base-atomic-aarch64"]
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+mr-cosmic-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image cosmic-atomic
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+mr-cosmic-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image cosmic-atomic
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-cosmic-atomic-x86_64:
+  stage: build
+  script:
+    - just compose-image cosmic-atomic
+    - just upload-container cosmic-atomic x86_64
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+build-cosmic-atomic-aarch64:
+  stage: build
+  script:
+    - just compose-image cosmic-atomic
+    - just upload-container cosmic-atomic aarch64
+  tags:
+    - saas-linux-small-arm64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
+
+merge-cosmic-atomic:
+  stage: merge
+  script:
+    - just multi-arch-manifest cosmic-atomic
+    - just sign cosmic-atomic
+  needs: ["build-cosmic-atomic-x86_64", "build-cosmic-atomic-aarch64"]
+  tags:
+    - saas-linux-small-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "f41" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule")
