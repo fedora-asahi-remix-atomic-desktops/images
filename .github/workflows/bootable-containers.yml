@@ -28,11 +28,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        version: ['rawhide', '42', '41'] # These correlate to branch names
         variant: ['silverblue', 'kinoite', 'base-atomic']
-
     runs-on: ubuntu-24.04-arm
     container:
-      image: "quay.io/fedora-ostree-desktops/buildroot:42"
+      image: "quay.io/fedora-ostree-desktops/buildroot:${{ matrix.version }}"
       options: "--security-opt=label=disable --privileged --user 0:0 --device=/dev/kvm --device=/dev/fuse --volume /:/run/host:rw"
     steps:
       - name: Reclaim disk space
@@ -61,6 +61,8 @@ jobs:
 
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.version == 'rawhide' && 'rawhide' || format('f{0}', matrix.version) }}
 
       - name: Get GPG keys for Asahi repos
         run: |
