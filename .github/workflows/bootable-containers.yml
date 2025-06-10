@@ -7,13 +7,6 @@ on:
   pull_request:
     branches:
       - f41
-  push:
-    branches:
-      - f41
-  schedule:
-    # At 02:00 every day
-    - cron: '0 2 * * *'
-  workflow_dispatch:
 
 permissions: read-all
 
@@ -67,7 +60,7 @@ jobs:
           dnf copr enable -y @asahi/fedora-remix-branding
           dnf install -y asahi-repos
 
-      - name: Install fixed rpm-ostree package
+      - name: Install latest rpm-ostree package from testing repos
         run: |
           dnf upgrade -y --enablerepo=updates-testing --refresh rpm-ostree
 
