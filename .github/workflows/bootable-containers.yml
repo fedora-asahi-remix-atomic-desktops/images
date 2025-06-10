@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ['rawhide', '42', '41'] # These correlate to branch names
+        version: ['42', '41'] # These correlate to branch names
         variant: ['silverblue', 'kinoite', 'base-atomic']
     runs-on: ubuntu-24.04-arm
     container:
@@ -62,7 +62,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ matrix.version == 'rawhide' && 'rawhide' || format('f{0}', matrix.version) }}
+          ref: ${{ matrix.version == 'rawhide' && 'main' || format('f{0}', matrix.version) }}
 
       - name: Get GPG keys for Asahi repos
         run: |
