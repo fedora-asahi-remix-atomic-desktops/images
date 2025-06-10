@@ -40,3 +40,69 @@ supported by the Asahi project (may not always be the latest release):
     - Unofficial build based on the unofficial Fedora Base Atomic variant
     - No desktop environment included
     - [quay.io/repository/fedora-asahi-remix-atomic-desktops/base-atomic](https://quay.io/repository/fedora-asahi-remix-atomic-desktops/base-atomic?tab=tags)
+
+## Container image signatures
+
+The images are signed using cosign and can be verified using the public key
+included in the repo. Here is how to setup container image signature
+verification:
+
+- Get the public key from this repo and install it:
+
+  ```
+  $ sudo mkdir /etc/pki/containers
+  $ curl -location -O "https://github.com/fedora-asahi-remix-atomic-desktops/images/raw/refs/heads/main/quay.io-fedora-asahi-remix-atomic-desktops.pub"
+  $ sudo cp quay.io-fedora-asahi-remix-atomic-desktops.pub /etc/pki/containers/
+  $ sudo restorecon -RFv /etc/pki/containers
+  $ rm quay.io-fedora-asahi-remix-atomic-desktops.pub
+  ```
+
+- Add registry configuration to get sigstore signatures:
+
+  ```
+  $ cat /etc/containers/registries.d/quay.io-fedora-asahi-remix-atomic-desktops.yaml
+  docker:
+    quay.io/fedora-asahi-remix-atomic-desktops
+      use-sigstore-attachments: true
+  $ sudo restorecon -RFv /etc/containers/registries.d
+  ```
+
+- Add config to the container fetching policy:
+
+  ```
+  {
+      "default": [{ "type": "reject" }],
+      "transports": {
+          "docker": {
+              "quay.io/fedora-asahi-remix-atomic-desktops": [
+                  {
+                      "type": "sigstoreSigned",
+                      "keyPath": "/etc/pki/containers/quay.io-fedora-asahi-remix-atomic-desktops.pub",
+                      "signedIdentity": {
+                          "type": "matchRepository"
+                      }
+                  }
+              ],
+              "": [{ "type": "insecureAcceptAnything" }]
+          },
+          "containers-storage": {
+              "": [{ "type": "insecureAcceptAnything" }]
+          },
+          "oci": {
+              "": [{ "type": "insecureAcceptAnything" }]
+          },
+          "oci-archive": {
+              "": [{ "type": "insecureAcceptAnything" }]
+          },
+          "docker-daemon": {
+              "": [{ "type": "insecureAcceptAnything" }]
+          }
+      }
+  }
+  ```
+
+- Rebase:
+
+  ```
+  $ sudo rpm-ostree rebase ostree-image-signed:registry:quay.io/fedora-asahi-remix-atomic-desktops/silverblue:42
+  ```
