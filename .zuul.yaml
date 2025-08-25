@@ -14,5 +14,4 @@
         - name: vm
           # Replace by a fixed version label after branching, once available:
           # https://fedora.softwarefactory-project.io/zuul/labels
-          # label: cloud-fedora-41-medium
-          label: cloud-fedora-40-medium
+          label: cloud-fedora-41-medium
