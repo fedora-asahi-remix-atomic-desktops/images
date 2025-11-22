@@ -273,6 +273,8 @@ desktop_exclude_list:
   swaywm-extended:
     # Non-critical apps -> Flatpak
     - mpv
+    # Explicitly added in common.yaml
+    - git-core
   cinnamon-desktop:
     # Incompatible with ostree for various reasons
     - abrt-desktop
