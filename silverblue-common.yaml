@@ -34,11 +34,11 @@ packages:
   # See: https://github.com/fedora-silverblue/issue-tracker/issues/201
   - openssl
 
-# Skip Third Party Software page in GNOME Initial Setup as it currently does
-# not work. See: https://bugzilla.redhat.com/show_bug.cgi?id=2362164
-# Users will be offered the option to enable third party repositories again the
-# first time they open GNOME Software.
 postprocess:
+  # Skip Third Party Software page in GNOME Initial Setup as it currently does
+  # not work. See: https://bugzilla.redhat.com/show_bug.cgi?id=2362164
+  # Users will be offered the option to enable third party repositories again the
+  # first time they open GNOME Software.
   - |
     #!/bin/bash
     set -xeuo pipefail
