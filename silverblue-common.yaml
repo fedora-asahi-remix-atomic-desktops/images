@@ -48,3 +48,13 @@ postprocess:
     # Do not show the Third Party Software page
     skip=software
     EOF
+  # Selected ownership fixes for files in /etc & /var owned by a dynamic UID/GID
+  # See: https://gitlab.com/fedora/ostree/sig/-/issues/90
+  - |
+    #!/bin/bash
+    set -xeuo pipefail
+
+    cat > /usr/lib/tmpfiles.d/90-silverblue-ownership-fixes.conf << 'EOF'
+    Z /var/lib/gnome-remote-desktop/ - gnome-remote-desktop gnome-remote-desktop
+    Z /etc/gnome-remote-desktop/     - gnome-remote-desktop gnome-remote-desktop
+    EOF

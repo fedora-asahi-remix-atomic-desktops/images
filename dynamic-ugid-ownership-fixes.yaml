@@ -10,6 +10,4 @@ postprocess:
     Z /var/lib/passim - passim passim
     Z /var/log/passim - passim passim
     Z /etc/colord/    - colord colord
-    Z /var/lib/gnome-remote-desktop/ - gnome-remote-desktop gnome-remote-desktop
-    Z /etc/gnome-remote-desktop/     - gnome-remote-desktop gnome-remote-desktop
     EOF
