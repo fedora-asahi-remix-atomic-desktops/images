@@ -1,28 +1,26 @@
+metadata:
+  summary: "Fedora Asahi Remix Base Atomic"
+
 variables:
-  bootable_container: true
-  variant: "base-atomic"
+  variant: "asahi-remix-base-atomic"
 
 include:
   - common.yaml
   - asahi-remix.yaml
 
-ref: fedora/rawhide/${basearch}/base-atomic-asahi-remix
-rojig:
-  name: fedora-base-atomic-asahi-remix
-  summary: "Fedora Base Atomic Asahi Remix"
-  license: MIT
-
 packages:
-  # Generic release package for desktop variants
-  - fedora-release
-  - fedora-release-ostree-desktop
   # XWayland support
   - xorg-x11-server-Xwayland
   # Portals for Flatpak
   - xdg-desktop-portal
   - xdg-desktop-portal-gtk
 
+# Can only be excluded on variants that do not include GNOME Software
+exclude-packages:
+  - PackageKit-glib
+
 # Kept in the leaf manifest as they are overwritten by Pungi in composes
 repos:
-  - fedora-43
-  - fedora-43-updates
+  - fedora-rawhide
+  # - fedora-44
+  # - fedora-44-updates
