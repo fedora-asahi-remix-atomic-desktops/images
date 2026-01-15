@@ -108,6 +108,8 @@ packages:
   - splix
   # See: https://github.com/fedora-silverblue/issue-tracker/issues/390
   - wireguard-tools
+  # See: https://gitlab.com/fedora/ostree/sig/-/issues/101
+  - gnupg2-scdaemon
 
 selinux: true
 documentation: true
