@@ -14,4 +14,4 @@
         - name: vm
           # Replace by a fixed version label after branching, once available:
           # https://fedora.softwarefactory-project.io/zuul/labels
-          label: cloud-fedora-rawhide-medium
+          label: cloud-fedora-43-medium
