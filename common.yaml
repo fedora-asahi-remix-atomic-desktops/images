@@ -170,6 +170,8 @@ exclude-packages:
   - gnome-software-fedora-langpacks
   # We include wget instead
   - wcurl
+  # See: https://fedoraproject.org/wiki/Changes/AtomicDesktopDropPklaCompat
+  - polkit-pkla-compat
 
 postprocess:
   - |
