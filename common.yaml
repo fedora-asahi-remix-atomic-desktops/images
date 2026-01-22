@@ -172,6 +172,10 @@ exclude-packages:
   - wcurl
   # See: https://fedoraproject.org/wiki/Changes/AtomicDesktopDropPklaCompat
   - polkit-pkla-compat
+  # See: https://fedoraproject.org/wiki/Changes/AtomicDesktopDropFuse2
+  # See: https://gitlab.com/fedora/ostree/sig/-/issues/50
+  - fuse
+  - fuselibs
 
 postprocess:
   - |

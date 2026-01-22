@@ -13,10 +13,6 @@ packages:
   # Must be included in the image until we figure out how to transistion users
   # to the Flatpak'ed one. See: https://gitlab.com/fedora/ostree/sig/-/issues/3
   - firefox
-  # Kept for backward compatibility for AppImages
-  # See: https://gitlab.com/fedora/ostree/sig/-/issues/50
-  - fuse
-  - fuse-libs
   # Allow downstreams to use an alternative
   - toolbox
 
