@@ -1,0 +1,38 @@
+name: "Daily comps-sync check"
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    - cron: '0 1 * * *'
+
+# Prevent multiple workflow runs from racing to ensure that pushes are made
+# sequentialy for the main branch. Also cancel in progress workflow runs for
+# pull requests only.
+concurrency:
+  group: ${{ forgejo.workflow }}-${{ forgejo.ref }}
+  cancel-in-progress: ${{ forgejo.event_name == 'pull_request' }}
+
+jobs:
+  validate:
+    runs-on: "docker"
+    container:
+      image: "quay.io/fedora/fedora:44"
+    steps:
+      - name: "Install required packages"
+        run: |
+          dnf install --assumeyes --refresh --allowerasing \
+            --no-docs --setopt=tsflags=nodocs \
+            --setopt=install_weak_deps=False \
+            git-core \
+            jq \
+            just \
+            nodejs \
+            python3-libcomps \
+            python3-pyyaml \
+            rpm-ostree
+
+      - name: "Checkout the repository"
+        uses: https://code.forgejo.org/actions/checkout@v6
+
+      - name: "Verify that the comps and manifests are synced"
+        run: just comps-sync-check
