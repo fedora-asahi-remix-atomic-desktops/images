@@ -22,7 +22,7 @@ def validate_shell(rootfd, name):
 
 for root, dirs, files, rootfd in os.fwalk('.'):
     # Skip folders that do not include content to validate
-    for d in ['.git', '.github', 'repo', 'cache', 'tmp', 'logs', 'fedora-comps']:
+    for d in ['.git', '.github', 'repo', 'cache', 'tmp', 'logs', 'fedora-comps', '.forgejo']:
         if d in dirs:
             dirs.remove(d)
     for f in ['.gitlab-ci.yml']:
