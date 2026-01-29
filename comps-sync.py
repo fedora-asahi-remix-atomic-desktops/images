@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 '''
-Usage: ./comps-sync.py [--save] /path/to/comps-f44.xml.in
+Usage: ./comps-sync.py [--save] /path/to/comps-f45.xml.in
 
 Filter and sync packages from comps groups into rpm-ostree manifests. The sync
 will remove packages from the manifests which are not mentioned in comps and

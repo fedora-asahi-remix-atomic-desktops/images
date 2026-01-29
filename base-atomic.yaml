@@ -21,5 +21,5 @@ exclude-packages:
 # Kept in the leaf manifest as they are overwritten by Pungi in composes
 repos:
   - fedora-rawhide
-  # - fedora-44
-  # - fedora-44-updates
+  # - fedora-45
+  # - fedora-45-updates

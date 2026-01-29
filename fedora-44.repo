@@ -1,6 +1,0 @@
-[fedora-44]
-name=Fedora 44 $basearch
-mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=fedora-44&arch=$basearch
-enabled=1
-gpgcheck=1
-metadata_expire=1d

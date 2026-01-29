@@ -197,13 +197,13 @@ https://pagure.io/fedora-comps and a `git` checkout of this repository.
 Using the `comps-sync.py` script, provide the updated input XML file to examine
 the changes as a dry-run:
 
-`$ ./comps-sync.py /path/to/fedora-comps/comps-f44.xml.in`
+`$ ./comps-sync.py /path/to/fedora-comps/comps-f45.xml.in`
 
 Examine the changes and cross-reference them with PRs made to the `fedora-comps`
 repo. When you are satisfied that the changes are accurate and appear safe,
 re-run the script with the `--save` option:
 
-`$ ./comps-sync.py --save /path/to/fedora-comps/comps-f44.xml.in`
+`$ ./comps-sync.py --save /path/to/fedora-comps/comps-f45.xml.in`
 
 Create a pull request with the changes and note any PRs from `fedora-comps`
 in the commit message that are relevant to the changes you have generated.
@@ -221,22 +221,22 @@ Make a PR similar to
 ### On Rawhide / main branch
 
 ```
-sed -i "s/44/45/g" *.repo comps-sync.py
-sed -i "s/releasever: 44/releasever: 45/" common.yaml
-sed -i --follow-symlinks "s/# - fedora-44/# - fedora-45/" *.yaml
-mv fedora-44.repo fedora-45.repo
-mv fedora-44-updates.repo fedora-45-updates.repo
+sed -i "s/45/46/g" *.repo comps-sync.py
+sed -i "s/releasever: 45/releasever: 46/" common.yaml
+sed -i --follow-symlinks "s/# - fedora-45/# - fedora-46/" *.yaml
+mv fedora-45.repo fedora-46.repo
+mv fedora-45-updates.repo fedora-46-updates.repo
+sed -i "s/46/46/g" README.md
 sed -i "s/45/46/g" README.md
-sed -i "s/44/45/g" README.md
 ```
 
-### On the new branch (f44)
+### On the new branch (f45)
 
 ```
 rm fedora-rawhide.repo
 sed -i --follow-symlinks "/- fedora-rawhide/d" *.yaml
-sed -i --follow-symlinks "s/# - fedora-44/- fedora-44/" *.yaml
-sed -i "s/releasever_ref: \"rawhide\"/releasever_ref: \"44\"/" common.yaml
+sed -i --follow-symlinks "s/# - fedora-45/- fedora-45/" *.yaml
+sed -i "s/releasever_ref: \"rawhide\"/releasever_ref: \"45\"/" common.yaml
 ```
 
 ## Historical references

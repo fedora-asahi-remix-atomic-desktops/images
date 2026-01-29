@@ -1,0 +1,6 @@
+[fedora-45-updates]
+name=Fedora 45 $basearch Updates
+mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=updates-released-f45&arch=$basearch
+enabled=1
+gpgcheck=1
+metadata_expire=1d
