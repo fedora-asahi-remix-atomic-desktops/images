@@ -5,7 +5,7 @@ packages:
   - alsa-ucm-asahi
   - asahi-platform-metapackage
   - asahi-repos
-  # - fedora-asahi-remix-scripts # Depends on dnf right now
+  - fedora-asahi-remix-scripts
   - tiny-dfr
   # boot
   - grub2-efi-aa64-modules

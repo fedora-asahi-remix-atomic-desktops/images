@@ -152,7 +152,7 @@ exclude-packages:
   - dnf
   - dnf-plugins-core
   # https://github.com/fedora-silverblue/issue-tracker/issues/517
-  - grubby
+  # - grubby # Needed for update-m1n1
   - sdubby
   # Exclude Tk. We can not exclude Tcl as it is neeeded for usb_modeswitch
   - tk
