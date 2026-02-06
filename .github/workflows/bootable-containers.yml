@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ['42', '41'] # These correlate to branch names
+        version: ['42'] # These correlate to branch names
         variant: ['silverblue', 'kinoite', 'base-atomic']
     runs-on: ubuntu-24.04-arm
     container:
