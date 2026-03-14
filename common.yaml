@@ -192,3 +192,32 @@ postprocess:
     # Fix triggerin for samba-client in cups package (not supported by rpm-ostree yet)
     # https://github.com/fedora-silverblue/issue-tracker/issues/532
     ln -snf /usr/libexec/samba/cups_backend_smb /usr/lib/cups/backend/smb
+
+    # Workaround broken appstream cache update
+    # See: https://gitlab.com/fedora/ostree/sig/-/work_items/103
+    cat > /usr/lib/systemd/system/fedora-atomic-desktop-appstream-cache-refresh.service << 'EOF'
+    [Unit]
+    Description=Workaround for Atomic Destkops to refresh the appstream cache
+    Documentation=https://gitlab.com/fedora/ostree/sig/-/work_items/103
+    ConditionPathIsReadWrite=/var
+    ConditionPathExists=/run/ostree-booted
+    After=local-fs.target
+
+    [Service]
+    Type=oneshot
+    RemainAfterExit=yes
+    ExecStart=appstreamcli refresh --force
+    Nice=19
+    IOWeight=10
+
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+
+    cat >> /usr/lib/systemd/system-preset/81-atomic-desktop.preset << 'EOF'
+
+    # See: https://gitlab.com/fedora/ostree/sig/-/work_items/103
+    enable fedora-atomic-desktop-appstream-cache-refresh.service
+    EOF
+
+    systemctl preset fedora-atomic-desktop-appstream-cache-refresh.service
