@@ -1,0 +1,27 @@
+discover:
+  how: fmf
+execute:
+  how: tmt
+
+/compose:
+  discover+:
+    test: /compose-image
+
+  /base-atomic:
+    environment:
+      COMPOSE_IMAGE: base-atomic
+  /silverblue:
+    environment:
+      COMPOSE_IMAGE: silverblue
+  /kinoite:
+    environment:
+      COMPOSE_IMAGE: kinoite
+  /sway-atomic:
+    environment:
+      COMPOSE_IMAGE: sway-atomic
+  /budgie-atomic:
+    environment:
+      COMPOSE_IMAGE: budgie-atomic
+  /cosmic-atomic:
+    environment:
+      COMPOSE_IMAGE: cosmic-atomic

@@ -1,0 +1,16 @@
+summary: "Compose a bootable container image for an Atomic Desktop"
+
+duration: 30m
+
+require:
+  - file
+  - git
+  - jq
+  - just
+  - ostree
+  - python3-pyyaml
+  - rpm-ostree
+  - selinux-policy-targeted
+
+/compose-image:
+  test: just compose-image $COMPOSE_IMAGE

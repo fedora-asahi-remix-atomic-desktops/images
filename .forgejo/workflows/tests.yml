@@ -1,0 +1,24 @@
+name: "Compose tests"
+run-name: >
+  Compose test (${{ forgejo.event_name }})
+  ${{ forgejo.event_name == 'pull_request' && format('PR#{0}', forgejo.event.number) || '' }}
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+# Prevent multiple workflow runs from racing to ensure that pushes are made
+# sequentialy for the main branch. Also cancel in progress workflow runs for
+# pull requests only.
+concurrency:
+  group: ${{ forgejo.workflow }}-${{ forgejo.ref }}
+  cancel-in-progress: true
+
+jobs:
+  testing-farm:
+    runs-on: "docker-slim"
+    steps:
+      - uses: https://forge.fedoraproject.org/ci/testing-farm@main
+        with:
+          api_key: ${{ secrets.TESTING_FARM_API_TOKEN }}
+          compose: Fedora-43
