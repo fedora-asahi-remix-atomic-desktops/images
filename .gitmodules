@@ -1,3 +1,4 @@
 [submodule "fedora-atomic-desktops"]
 	path = fedora-atomic-desktops
 	url = https://forge.fedoraproject.org/atomic-desktops/config.git
+	branch = f44
