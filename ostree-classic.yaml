@@ -1,7 +1,0 @@
-# Manifest for classic ostree varaints only and not Bootable Containers
-
-# We do not include any version of DNF in the classic ostree Atomic Desktops
-# See: https://fedoraproject.org/wiki/Changes/DNFAndBootcInImageModeFedora
-exclude-packages:
-  - dnf5
-  - dnf5-plugins
