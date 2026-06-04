@@ -2,14 +2,11 @@ metadata:
   summary: "Fedora Asahi Remix Kinoite"
 
 variables:
+  distro: "fedora-asahi-remix"
   variant: "asahi-remix-kinoite"
 
 include:
-  - kinoite-common.yaml
+  - fedora-atomic-desktops/kinoite-common.yaml
+  - fedora-atomic-desktops/fedora.yaml
+  - repos.yaml
   - asahi-remix.yaml
-
-# Kept in the leaf manifest as they are overwritten by Pungi in composes
-repos:
-  - fedora-rawhide
-  # - fedora-44
-  # - fedora-44-updates
