@@ -3,10 +3,8 @@ name: "Build Fedora Asahi Remix Atomic Desktops Bootable Container images"
 env:
   REGISTRY: "quay.io/fedora-asahi-remix-atomic-desktops"
 
+# Only used for scheduled or manually triggered builds for all branches
 on:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
@@ -28,26 +26,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Skip 'rawhide' as some Asahi specific package are not available
         version: ['44', '43'] # These correlate to branch names
         variant: ['silverblue', 'kinoite', 'base-atomic']
-    runs-on: ubuntu-24.04-arm
+    runs-on: "ubuntu-24.04-arm"
     container:
       image: "quay.io/fedora-ostree-desktops/buildroot:${{ matrix.version }}"
       options: "--security-opt=label=disable --privileged --user 0:0 --device=/dev/kvm --device=/dev/fuse --volume /:/run/host:rw"
     steps:
-      - name: Reclaim disk space
+      - name: "Reclaim disk space"
         run: |
           rm -rf "/run/host/usr/local/lib/android"
 
-      - name: Fixup containers/storage.conf
+      - name: "Fixup containers/storage.conf"
         run: |
           sed -i 's/driver = "overlay"/driver = "vfs"/' /usr/share/containers/storage.conf
 
-      - name: Fixup GitHub homedir
+      - name: "Fixup GitHub homedir"
         run: |
           mkdir -p /github/home/.docker/
 
-      - name: Login to Container Registry
+      - name: "Login to Container Registry"
         uses: redhat-actions/podman-login@v1
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         with:
@@ -56,30 +55,32 @@ jobs:
           password: ${{ secrets.BOT_SECRET }}
           auth_file_path: /tmp/auth.json
 
-      - uses: sigstore/cosign-installer@v3.6.0
+      - name: "Setup cosign"
+        uses: sigstore/cosign-installer@v3.6.0
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
 
-      - name: Checkout repo
+      - name: "Checkout repo"
         uses: actions/checkout@v4
         with:
+          submodules: true
           ref: ${{ matrix.version == 'rawhide' && 'main' || format('f{0}', matrix.version) }}
 
-      - name: Get GPG keys for Asahi repos
+      - name: "Get GPG keys for Asahi repos"
         run: |
           dnf copr enable -y @asahi/fedora-remix-branding
           dnf install -y asahi-repos
 
-      - name: Install latest rpm-ostree package from testing repos
+      - name: "Install latest rpm-ostree package from testing repos"
         run: |
           dnf upgrade -y --enablerepo=updates-testing --refresh rpm-ostree
 
-      - name: Build Bootable Container image
+      - name: "Build Bootable Container image"
         run: |
           just compose-image ${VARIANT}-asahi-remix
         env:
           VARIANT: ${{ matrix.variant }}
 
-      - name: Push container image to container registry
+      - name: "Push container image to container registry"
         id: push
         run: |
           buildid=""
@@ -105,7 +106,7 @@ jobs:
         env:
           VARIANT: ${{ matrix.variant }}
 
-      - name: Sign container image
+      - name: "Sign container image"
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |
           version="$(rpm-ostree compose tree --print-only --repo=repo silverblue-asahi-remix.yaml | jq -r '."mutate-os-release"')"
