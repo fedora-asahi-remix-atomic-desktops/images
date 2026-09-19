@@ -16,6 +16,27 @@ packages:
   # desktop-environments
   - aajohan-comfortaa-fonts
 
+postprocess:
+  # On Apple Silicon, U-Boot boots the removable media path EFI/BOOT/BOOTAA64.EFI
+  # (shim), which then looks for grubaa64.efi next to it. Fedora only ships
+  # GRUB under EFI/fedora, so if the ESP is populated from the bootupd payload
+  # (bootc install, bootupctl adopt-and-update) shim falls back to fbaa64.efi
+  # and the system may not boot. Add GRUB to the EFI/BOOT payload as well,
+  # matching what the Asahi installer does. GRUB's embedded prefix is
+  # /EFI/fedora so it still reads the grub.cfg written by bootupd there.
+  - |
+    #!/usr/bin/bash
+    set -xeuo pipefail
+
+    found=0
+    for efidir in /usr/lib/efi/grub2/*/EFI; do
+        [[ -f "${efidir}/fedora/grubaa64.efi" ]] || continue
+        install -dm0755 "${efidir}/BOOT"
+        cp -a "${efidir}/fedora/grubaa64.efi" "${efidir}/BOOT/grubaa64.efi"
+        found=1
+    done
+    [[ "${found}" == 1 ]] || (echo "grubaa64.efi not found in /usr/lib/efi/grub2" && exit 1)
+
 repos:
   - fedora-asahi-remix-hotfixes
   - copr:copr.fedorainfracloud.org:group_asahi:fedora-remix-branding
