@@ -117,11 +117,22 @@ to a registry with `skopeo copy`.
 
 ## How to use
 
+See [INSTALLATION](INSTALLATION.md) for work in progress installation instructions.
+
 You need an existing Fedora Asahi Remix installation on your Apple Silicon Mac
 (this project does not provide an installer) as the Asahi boot chain
-(m1n1, U-Boot) is setup by the official installer. These images are then
-meant to be used with `bootc` or `rpm-ostree` on a Fedora Atomic Desktop
-system.
+(m1n1, U-Boot) is setup by the official installer.
+
+To convert your installation, you can follow the
+[setup guide from smoush7](https://gist.github.com/smoush7/fec3d92f6075ece27f7dd875b5dc459b).
+
+See also
+[issue#1](https://github.com/fedora-asahi-remix-atomic-desktops/images/issues/1)
+and
+[issue#5](https://github.com/fedora-asahi-remix-atomic-desktops/images/issues/5)
+for the discussion.
+
+You can then use those images with `bootc` or `rpm-ostree`:
 
 Follow the [signature verification setup](#container-image-signatures)
 below, then rebase to the desired variant and Fedora release, for example:
@@ -136,9 +147,9 @@ or with `rpm-ostree`:
 $ sudo rpm-ostree rebase ostree-image-signed:registry:quay.io/fedora-asahi-remix-atomic-desktops/base-atomic:44
 ```
 
-Reboot to the new deployment. If it does not work, boot the previous
-deployment from the bootloader menu and run `sudo bootc rollback` (or
-`sudo rpm-ostree rollback`).
+Reboot to the new deployment. If it does not work, boot the previous deployment
+from the bootloader menu and run `sudo bootc rollback` (or `sudo rpm-ostree
+rollback`).
 
 ## Images
 
