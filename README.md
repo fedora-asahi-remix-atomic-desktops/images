@@ -117,7 +117,7 @@ to a registry with `skopeo copy`.
 
 ## How to use
 
-See [INSTALLATION](INSTALLATION.md) for work in progress installation instructions.
+<!-- See [INSTALLATION](INSTALLATION.md) for work in progress installation instructions. -->
 
 You need an existing Fedora Asahi Remix installation on your Apple Silicon Mac
 (this project does not provide an installer) as the Asahi boot chain
