@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         # Skip 'rawhide' as some Asahi specific package are not available
-        version: ['44', '43'] # These correlate to branch names
+        version: ['45', '44', '43'] # These correlate to branch names
         variant: ['silverblue', 'kinoite', 'base-atomic']
     runs-on: "ubuntu-26.04-arm"
     container:
